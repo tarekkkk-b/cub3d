@@ -6,7 +6,7 @@
 /*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 12:47:38 by tabadawi          #+#    #+#             */
-/*   Updated: 2023/12/04 14:38:49 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/13 19:49:18 by tabadawi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static int	checkset(char s, char const *set)
 	return (0);
 }
 
-char	*ft_strtrim(char const *s1, char const *set)
+char	*ft_strtrim(char *s1, char const *set)
 {
 	char	*new;
 	int		start;
@@ -47,5 +47,6 @@ char	*ft_strtrim(char const *s1, char const *set)
 	while (start < end)
 		new[i++] = s1[start++];
 	new[i] = '\0';
+	free(s1);
 	return (new);
 }

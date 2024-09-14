@@ -6,7 +6,7 @@
 /*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/17 11:22:31 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/03/17 11:22:53 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/13 20:17:18 by tabadawi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static char	*ft_save(char *save)
 	i = 0;
 	while (save[i] && save[i] != '\n')
 		i++;
-	if (!save[i])
+	if (!save[i] || (save[i] && !save[i + 1]))
 	{
 		free(save);
 		return (NULL);
