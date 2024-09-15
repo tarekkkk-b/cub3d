@@ -6,7 +6,7 @@
 /*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:22:00 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/09/14 21:21:57 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/15 20:46:19 by tabadawi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,11 @@
 # define SOUTH		'S'
 # define USAGE		"Usage: ./cub3d [map_path].cub\n"
 # define FILE_404	"File not found.\n"
+# define TXTR_404	"Texture not found.\n"
 # define EMPTY		"Empty file\n"
 # define INVALID	"Invalid map file.\n"
+# define INV_TXTR	"Invalid texture path\n"
+# define XPM		"Invalid .xpm file\n"
 
 /*****************************************************
 *						structs						*
@@ -64,7 +67,9 @@ typedef struct s_textures
 	void	*west;
 	void	*south;
 	int		floor;
-	int		sky;
+	int		f_arr[3];
+	int		ceiling;
+	int		c_arr[3];
 }	t_textures;
 
 typedef struct s_game

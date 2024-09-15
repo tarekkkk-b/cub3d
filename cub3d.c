@@ -6,7 +6,7 @@
 /*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:21:58 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/09/14 21:27:50 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/15 22:09:13 by tabadawi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int	collected_textures(t_textures *textures)
 		&& textures->south
 		&& textures->north
 		&& textures->floor != -1
-		&& textures->sky != -1)
+		&& textures->ceiling != -1)
 			return (1);
 	return (0);
 }
@@ -95,32 +95,92 @@ void	init_textures(t_textures *textures)
 	textures->north = NULL;
 	textures->south = NULL;
 	textures->west = NULL;
-	textures->sky = -1;
+	textures->ceiling = -1;
 	textures->floor = -1;
 }
 
 void	assign_texture(char *str, void **texture, void	*mlx)
 {
 	char	**holder;
-	int height, width;
+	int		height;
+	int		width;
+	int		fd;
 
 	holder = ft_split(str, ' ');
 	if (!holder[0] || !holder[1] || holder[2])
-		(printf("extra thing in texture\n"), free_array(holder), exit(1));
-	int	fd;
+		return ((void)write(2, INV_TXTR, ft_strlen(INV_TXTR)));
 	fd = open(holder[1], O_RDONLY);
 	if (fd == -1)
-		(printf("no file to open\n"), free_array(holder), exit(1));
+		return ((void)write(2, TXTR_404, ft_strlen(TXTR_404)));
 	close(fd);
-	texture = mlx_xpm_file_to_image(mlx, holder[1], &width, &height);
-	if (!texture)
-		(printf("no xpm\n"), exit(1));
+	(*texture) = mlx_xpm_file_to_image(mlx, holder[1], &width, &height);
+	if (!(*texture))
+		return ((void)write(2, XPM, ft_strlen(XPM)));
 	free_array(holder);
 }
 
-void	assign_colour(int *colour)
+int	create_rgb(int *color_arr)
 {
-	(*colour) = 1;
+	int	r;
+	int	g;
+	int	b;
+	int a;
+
+	r = color_arr[0];
+	g = color_arr[1];
+	b = color_arr[2];
+	a = 0x00000000;
+	return (r << 16 | g << 8 | b | a);
+}
+
+int	set_colour(int i, int *arr, int clr_counter, char *str)
+{
+	int index = 0;
+	char	colour[4];
+	while (str[i++] && ft_isdigit(str[i]))
+	{
+		if (index > 2)
+			return (-1);
+		colour[index++] = str[i];
+	}
+	colour[index++] = '\n';
+		printf("%s\n\n\n", colour);
+	arr[clr_counter] = ft_atoi(colour);
+	if (arr[clr_counter] > 255 || arr[clr_counter] < 0)
+		return (-1);
+	return (i);
+}
+
+void	assign_colour(char *str, int *colour, int *arr)
+{
+	int	i;
+	int clr_counter;
+	int comma_counter;
+
+	i = 0;
+	clr_counter = 0;
+	comma_counter = 0;
+	while (str[i] && (str[i] == ' ' || str[i] == 'F' || str[i] == 'C'))
+		i++;
+	while (str[i])
+	{
+		if (str[i] && str[i] != ',' && str[i] != ' ' && !ft_isdigit(str[i]))
+			(printf("%c: not for the colour\n", str[i]), exit(1));
+		if (comma_counter > 2 || clr_counter > 3)
+			(printf("wrong count 1\n"), exit(1));
+		if (str[i] == ',')
+			comma_counter++;
+		if (ft_isdigit(str[i]))
+		{
+			printf("this is: %c\n", str[i]);
+			i += set_colour(i, arr, clr_counter, str) == -1;
+		}
+		if (i == -1)
+			(printf("colour problem\n"), exit(1));
+		i++;
+	}
+	(*colour) = create_rgb(arr);
+	printf("%x\n\n\n", *colour);
 }
 
 int	check_texture(char *str, t_textures *textures, void	*mlx)
@@ -139,9 +199,9 @@ int	check_texture(char *str, t_textures *textures, void	*mlx)
 	else if (str[i] == EAST && str[i + 1] == 'A' && str[i + 2] == ' ')
 		assign_texture(str, &textures->east, mlx);
 	else if (str[i] == 'C' && str[i + 1] == ' ')
-		assign_colour(&textures->sky);
+		assign_colour(str, &textures->ceiling, textures->c_arr);
 	else if (str[i] == 'F' && str[i + 1] == ' ')
-		assign_colour(&textures->floor);
+		assign_colour(str, &textures->floor, textures->f_arr);
 	else
 		return (0);
 	return (1);
@@ -155,12 +215,11 @@ int	get_textures(t_file *file, t_textures *textures, void *mlx)
 	init_textures(textures);
 	while (file->file[++i])
 	{
-		if (!empty_line(file->file[i]))
-			if (!check_texture(file->file[i], textures, mlx))
-				(printf("not a texture\n"), exit (1));
-
 		if (collected_textures(textures))
 			break ;
+		if (!empty_line(file->file[i]))
+			if (!check_texture(file->file[i], textures, mlx))
+				(printf("%s: not a texture\n", file->file[i]), exit (1));
 	}
 	while (file->file[i] && empty_line(file->file[i]))
 		i++;
