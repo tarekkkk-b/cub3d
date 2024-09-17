@@ -6,7 +6,7 @@
 /*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:22:00 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/09/15 20:46:19 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/17 21:36:04 by tabadawi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,9 @@ typedef struct s_map
 	char	**map;
 	int		height;
 	int		width;
+	int		player_x;
+	int		player_y;
+	int		player;
 }	t_map;
 
 typedef struct s_textures
