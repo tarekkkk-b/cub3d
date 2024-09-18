@@ -6,7 +6,7 @@
 /*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:21:58 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/09/17 21:44:55 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/18 13:48:54 by tabadawi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,11 +95,13 @@ void	init_textures(t_textures *textures)
 	textures->north = NULL;
 	textures->south = NULL;
 	textures->west = NULL;
+	textures->ceiling_txtr = NULL;
+	textures->floor_txtr = NULL;
 	textures->ceiling = -1;
 	textures->floor = -1;
 }
 
-void	assign_texture(char *str, void **texture, void	*mlx)
+int	assign_texture(char *str, void **texture, t_game *game, int err_flag)
 {
 	char	**holder;
 	int		height;
@@ -108,15 +110,28 @@ void	assign_texture(char *str, void **texture, void	*mlx)
 
 	holder = ft_split(str, ' ');
 	if (!holder[0] || !holder[1] || holder[2])
-		return ((void)write(2, INV_TXTR, ft_strlen(INV_TXTR)));
+	{
+		if (err_flag)
+			write(2, INV_TXTR, ft_strlen(INV_TXTR));
+		return(0);
+	}
 	fd = open(holder[1], O_RDONLY);
 	if (fd == -1)
-		return ((void)write(2, TXTR_404, ft_strlen(TXTR_404)));
+	{
+		if (err_flag)
+			write(2, TXTR_404, ft_strlen(TXTR_404));
+		return(0);
+	}
 	close(fd);
-	(*texture) = mlx_xpm_file_to_image(mlx, holder[1], &width, &height);
+	(*texture) = mlx_xpm_file_to_image(game->mlx, holder[1], &width, &height);
 	if (!(*texture))
-		return ((void)write(2, XPM, ft_strlen(XPM)));
+	{
+		if (err_flag)
+			write(2, XPM, ft_strlen(XPM));
+		return(0);
+	}
 	free_array(holder);
+	return (1);
 }
 
 int	create_rgb(int *color_arr)
@@ -153,14 +168,37 @@ int	set_colour(int i, int *arr, int clr_counter, char *str)
 	return (i);
 }
 
-void	assign_colour(char *str, int *colour, int *arr)
+void	assign_colour(char *str, int *colour, int *arr, t_game *game)
 {
-	int	i;
-	int	clr_counter;
-	int	comma_counter;
-	int	letter_counter;
-
+	int		i;
+	int		clr_counter;
+	int		comma_counter;
+	int		letter_counter;
+	char	**temp;
+	
+	
 	i = 0;
+	temp = ft_split(str, ' ');
+	if (temp[0] && temp[1] && !temp[2])
+	{
+		if (temp[0][0] == 'C')
+		{
+			if (assign_texture(str, &game->textures.ceiling_txtr, game->mlx, 0))
+			{
+				game->textures.ceiling = 0;
+				return (free_array(temp));
+			}
+		}
+		else if (temp[0][0] == 'F')
+		{
+			if (assign_texture(str, &game->textures.floor_txtr, game->mlx, 0))
+			{
+				game->textures.floor = 0;
+				return (free_array(temp));
+			}
+		}
+	}
+	free_array(temp);
 	clr_counter = 0;
 	comma_counter = 0;
 	letter_counter = 0;
@@ -179,23 +217,27 @@ void	assign_colour(char *str, int *colour, int *arr)
 	{
 		if (str[i] && str[i] != ',' && str[i] != ' ' && !ft_isdigit(str[i]))
 			(printf("%c: not for the colour\n", str[i]), exit(1));
-		if (comma_counter > 2 || clr_counter > 3)
-			(printf("wrong count\n"), exit(1));
 		if (str[i] == ',')
 			comma_counter++;
 		if (ft_isdigit(str[i]))
 		{
 			i = set_colour(i, arr, clr_counter, str);
 			clr_counter++;
+			if (comma_counter != clr_counter - 1)
+				(printf("wrong count\n"), exit(1));
 		}
 		if (i == -1)
 			(printf("colour problem\n"), exit(1));
+		if (clr_counter > 3)
+			(printf("wrong count\n"), exit(1));
 		i++;
 	}
+	if (clr_counter != 3 || comma_counter != 2)
+		(printf("colour problem\n"), exit(1));
 	(*colour) = create_rgb(arr);
 }
 
-int	check_texture(char *str, t_textures *textures, void	*mlx)
+int	check_texture(char *str, t_textures *textures, t_game *game)
 {
 	int	i;
 
@@ -203,23 +245,23 @@ int	check_texture(char *str, t_textures *textures, void	*mlx)
 	while (str[i] && str[i] == ' ')
 		i++;
 	if (str[i] == NORTH && str[i + 1] == 'O' && str[i + 2] == ' ')
-		assign_texture(str, &textures->north, mlx);
+		assign_texture(str, &textures->north, game, 1);
 	else if (str[i] == SOUTH && str[i + 1] == 'O' && str[i + 2] == ' ')
-		assign_texture(str, &textures->south, mlx);
+		assign_texture(str, &textures->south, game, 1);
 	else if (str[i] == WEST && str[i + 1] == 'E' && str[i + 2] == ' ')
-		assign_texture(str, &textures->west, mlx);
+		assign_texture(str, &textures->west, game, 1);
 	else if (str[i] == EAST && str[i + 1] == 'A' && str[i + 2] == ' ')
-		assign_texture(str, &textures->east, mlx);
+		assign_texture(str, &textures->east, game, 1);
 	else if (str[i] == 'C' && str[i + 1] == ' ')
-		assign_colour(str, &textures->ceiling, textures->c_arr);
+		assign_colour(str, &textures->ceiling, textures->c_arr, game);
 	else if (str[i] == 'F' && str[i + 1] == ' ')
-		assign_colour(str, &textures->floor, textures->f_arr);
+		assign_colour(str, &textures->floor, textures->f_arr, game);
 	else
 		return (0);
 	return (1);
 }
 
-int	get_textures(t_file *file, t_textures *textures, void *mlx)
+int	get_textures(t_file *file, t_textures *textures, t_game *game)
 {
 	int	i;
 
@@ -230,8 +272,11 @@ int	get_textures(t_file *file, t_textures *textures, void *mlx)
 		if (collected_textures(textures))
 			break ;
 		if (!empty_line(file->file[i]))
-			if (!check_texture(file->file[i], textures, mlx))
+			if (!check_texture(file->file[i], textures, game))
+			{
+				printf("n: %s\ne: %s\nw: %s\ns: %s\nc: %d\nf: %d\n", textures->north, textures->east, textures->west, textures->south, textures->ceiling, textures->floor);
 				(printf("%s: not a texture\n", file->file[i]), exit (1));
+			}
 	}
 	while (file->file[i] && empty_line(file->file[i]))
 		i++;
@@ -246,7 +291,7 @@ int	map_line(char *str)
 
 	i = -1;
 	while (str[++i])
-		if (!ft_strchr("10NEWS ", str[i]))
+		if (!ft_strchr("10NEWSD ", str[i]))
 			(printf("BAD ELEMENT\n"), exit(1));
 	return (1);
 }
@@ -324,35 +369,10 @@ int	edge(char *str)
 	return(1);
 }
 
-int	closed_line(char *str)
-{
-	int i = 0;
-	while (str[i] && str[i] == ' ')
-		i++;
-	if (str[i] != WALL)
-	{
-		printf("loop1 char:	<<%c>>	index:	<<%d>>\n", str[i], i);
-		return (0);
-	}
-	i = ft_strlen(str) - 1;
-	while (i > 0 && str[i] == ' ')
-		i--;
-	if (str[i] != WALL)
-	{
-		printf("loop2 char:	<<%c>>	index:	<<%d>>\n", str[i], i);
-		return (0);
-	}
-	return (1);
-}
-
 void	check_closed(t_map *map)
 {
-	int i = 0;
 	if (!edge(map->map[0]) || !edge(map->map[map->height - 1]))
 		(printf("close your top or bottom\n"), exit(1));
-	while (++i < map->height - 1)
-		if (!closed_line(map->map[i]))
-			(printf("CLOSE YO MAP\n"), exit(1));
 }
 
 void	check_player(t_map *map)
@@ -380,7 +400,7 @@ void	check_player(t_map *map)
 		}
 	}
 	if (!player)
-		(printf("soo.... u dont wanna play\n"), exit(1));
+		(printf("soo.... u dont wanna play?\n"), exit(1));
 	// printf("player x:	%d\nplayer y:	%d\n", map->player_x, map->player_y);
 }
 
@@ -399,6 +419,8 @@ void	no_void(t_map *map)
 				invalid = '0';
 			else if (map->map[i][j] == map->player)
 				invalid = ' ';
+			else if (map->map[i][j] == DOOR)
+				invalid = ' ';
 			else
 				continue ;
 			if (j > 0 && map->map[i][j - 1] == invalid)
@@ -413,13 +435,6 @@ void	no_void(t_map *map)
 	}
 }
 
-void	validate_map(t_map *map)
-{
-	check_closed(map);
-	check_player(map);
-	no_void(map);
-}
-
 void	parsing(char *path, t_game *game)
 {
 	int			index;
@@ -428,49 +443,51 @@ void	parsing(char *path, t_game *game)
 	index = 0;
 	validate_file(path, &file);
 	get_file(path, &file);
-	index += get_textures(&file, &game->textures, game->mlx);
+	index += get_textures(&file, &game->textures, game);
 	if (!collected_textures(&game->textures))
 		(printf("couldnt get them all\n"), exit(1));
 	get_map(&file, &game->map, index);
 	free_array(file.file);
-	validate_map(&game->map);
+	check_closed(&game->map);
+	check_player(&game->map);
+	no_void(&game->map);
 }
 
 int	main(int ac, char **av)
 {
 	t_game	game;
 	int		i;
-	// int		j;
+	int		j;
 
 	i = 0;
 	if (ac != 2)
 		(write(2, USAGE, ft_strlen(USAGE)), exit(1));
 	game.mlx = mlx_init();
 	parsing(av[1], &game);
-	// game.window = mlx_new_window(game.mlx, 500, 500, "cub test");
-	// while (i < 250)
-	// {
-	// 	j = 0;
-	// 	while (j < 500)
-	// 	{
-	// 		mlx_pixel_put(game.mlx, game.window, j, i, game.textures.ceiling);
-	// 		j++;
-	// 	}
-	// 	i++;
-	// }
-	// while (i < 500)
-	// {
-	// 	j = 0;
-	// 	while (j < 500)
-	// 	{
-	// 		mlx_pixel_put(game.mlx, game.window, j, i, game.textures.floor);
-	// 		j++;
-	// 	}
-	// 	i++;
-	// }
+	game.window = mlx_new_window(game.mlx, 500, 500, "cub test");
+	while (i < 250)
+	{
+		j = 0;
+		while (j < 500)
+		{
+			mlx_pixel_put(game.mlx, game.window, j, i, game.textures.ceiling);
+			j++;
+		}
+		i++;
+	}
+	while (i < 500)
+	{
+		j = 0;
+		while (j < 500)
+		{
+			mlx_pixel_put(game.mlx, game.window, j, i, game.textures.floor);
+			j++;
+		}
+		i++;
+	}
 	// mlx_put_image_to_window(game.mlx, game.window, game.textures.east, 0, 0);
 	// mlx_put_image_to_window(game.mlx, game.window, game.textures.west, 250, 0);
 	// mlx_put_image_to_window(game.mlx, game.window, game.textures.north, 0, 250);
 	// mlx_put_image_to_window(game.mlx, game.window, game.textures.south, 250, 250);
-	// mlx_loop(game.mlx);
+	mlx_loop(game.mlx);
 }

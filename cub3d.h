@@ -6,7 +6,7 @@
 /*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:22:00 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/09/17 21:36:04 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/18 12:54:23 by tabadawi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 # define EAST		'E'
 # define WEST		'W'
 # define SOUTH		'S'
+# define DOOR		'D'
 # define USAGE		"Usage: ./cub3d [map_path].cub\n"
 # define FILE_404	"File not found.\n"
 # define TXTR_404	"Texture not found.\n"
@@ -69,6 +70,8 @@ typedef struct s_textures
 	void	*east;
 	void	*west;
 	void	*south;
+	void	*floor_txtr;
+	void	*ceiling_txtr;
 	int		floor;
 	int		f_arr[3];
 	int		ceiling;
