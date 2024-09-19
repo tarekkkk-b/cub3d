@@ -6,7 +6,7 @@
 /*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:22:00 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/09/18 12:54:23 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/19 15:24:53 by tabadawi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,5 +90,8 @@ typedef struct s_game
 /*****************************************************
 *					functions						*
 *****************************************************/
+
+int	minimap(t_game *game);
+void	rendermap(t_game *game);
 
 #endif
