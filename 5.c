@@ -6,7 +6,7 @@
 /*   By: ahashem <ahashem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/18 10:49:40 by ahashem           #+#    #+#             */
-/*   Updated: 2024/09/18 21:32:59 by ahashem          ###   ########.fr       */
+/*   Updated: 2024/09/19 17:30:44 by ahashem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,13 @@ int	map_line(char *str)
 	return (1);
 }
 
-int	check_len(int index, t_map *map, t_file *file)
+void	check_len(int index, t_map *map, t_file *file)
 {
 	int	empty;
 	int	width;
 
 	empty = 0;
 	width = 0;
-	map->height = 0;
 	while (file->file[index] && empty_line(file->file[index]))
 		index++;
 	map->width = ft_strlen(file->file[index]);
@@ -56,7 +55,17 @@ int	check_len(int index, t_map *map, t_file *file)
 		index++;
 	}
 	// printf("map width: %d\n", map->width);
-	return (map->height);
+	// return (map->height);
+}
+
+void	init_map(t_map *map)
+{
+	map->map = NULL;
+	map->height = 0;
+	map->width = 0;
+	map->player_x = 0;
+	map->player_y = 0;
+	map->player = 0;
 }
 
 void	get_map(t_file *file, t_map *map, int index)
@@ -64,10 +73,13 @@ void	get_map(t_file *file, t_map *map, int index)
 	int	i;
 	int	t;
 
-	map->height = check_len(index, map, file);
+	init_map(map);
+	check_len(index, map, file);
 	if (map->height == -1 || map->height < 3)
 		(printf("womp womp map problem\n"), exit(1));
 	map->map = malloc(sizeof(char *) * (map->height + 1));
+	if (!map->map)
+		exit(1);
 	while (file->file[index] && empty_line(file->file[index]))
 		index++;
 	i = 0;
