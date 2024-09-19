@@ -6,15 +6,15 @@
 #    By: ahashem <ahashem@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/12 17:22:05 by tabadawi          #+#    #+#              #
-#    Updated: 2024/09/19 18:24:14 by ahashem          ###   ########.fr        #
+#    Updated: 2024/09/19 18:29:16 by ahashem          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=	cub3d
 CC		=	cc
-CFLAGS	=	-Wall -Werror -Wextra -g3
+CFLAGS	=	-Wall -Werror -Wextra -g3 -Ofast
 CFLAGS	+=	-fsanitize=address
-SRCS 	=	cub3d.c 1.c 2.c 3.c 4.c 5.c 6.c
+SRCS 	=	cub3d.c minimap.c 1.c 2.c 3.c 4.c 5.c 6.c
 OBJS	=	$(SRCS:.c=.o)
 LIBFT	=	libft/libft.a
 MLX		=	mlx/libmlx.a

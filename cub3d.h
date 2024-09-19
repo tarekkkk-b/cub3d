@@ -6,7 +6,7 @@
 /*   By: ahashem <ahashem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:22:00 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/09/19 18:25:00 by ahashem          ###   ########.fr       */
+/*   Updated: 2024/09/19 18:28:50 by ahashem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,5 +112,8 @@ void	check_closed(t_map *map);
 
 int		empty_line(char *str);
 void	free_array(char **arr);
+
+int	minimap(t_game *game);
+void	rendermap(t_game *game);
 
 #endif
