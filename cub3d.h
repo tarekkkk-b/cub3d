@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tabadawi <tabadawi@student.42abudhabi.a    +#+  +:+       +#+        */
+/*   By: ahashem <ahashem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:22:00 by tabadawi          #+#    #+#             */
-/*   Updated: 2024/09/18 12:54:23 by tabadawi         ###   ########.fr       */
+/*   Updated: 2024/09/19 18:25:00 by ahashem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,5 +90,27 @@ typedef struct s_game
 /*****************************************************
 *					functions						*
 *****************************************************/
+
+//						parsing						//
+
+void	parsing(char *path, t_game *game);
+
+void	validate_file(char *path, t_file *file);
+void	get_file(char *path, t_file *file);
+
+int		get_textures(t_file *file, t_textures *textures, t_game *game);
+int		collected_textures(t_textures *textures);
+
+void	assign_colour(char *str, int *colour, int *arr, t_game *game);
+int		assign_texture(char *str, void **texture, t_game *game, int err_flag);
+
+void	get_map(t_file *file, t_map *map, int index);
+
+void	no_void(t_map *map);
+void	check_player(t_map *map);
+void	check_closed(t_map *map);
+
+int		empty_line(char *str);
+void	free_array(char **arr);
 
 #endif

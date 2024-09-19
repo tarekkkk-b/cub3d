@@ -6,7 +6,7 @@
 /*   By: ahashem <ahashem@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/18 10:49:40 by ahashem           #+#    #+#             */
-/*   Updated: 2024/09/19 17:30:44 by ahashem          ###   ########.fr       */
+/*   Updated: 2024/09/19 18:24:44 by ahashem          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	map_line(char *str)
 	return (1);
 }
 
-void	check_len(int index, t_map *map, t_file *file)
+int	check_len(int index, t_map *map, t_file *file)
 {
 	int	empty;
 	int	width;
@@ -55,7 +55,7 @@ void	check_len(int index, t_map *map, t_file *file)
 		index++;
 	}
 	// printf("map width: %d\n", map->width);
-	// return (map->height);
+	return (map->height);
 }
 
 void	init_map(t_map *map)
@@ -74,7 +74,7 @@ void	get_map(t_file *file, t_map *map, int index)
 	int	t;
 
 	init_map(map);
-	check_len(index, map, file);
+	map->height = check_len(index, map, file);
 	if (map->height == -1 || map->height < 3)
 		(printf("womp womp map problem\n"), exit(1));
 	map->map = malloc(sizeof(char *) * (map->height + 1));
